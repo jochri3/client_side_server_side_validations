@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <h1>Form non ajax</h1>
+    <h2 id="success"></h2>
+    <div>
+      <input id="nom" type="text" placeholder="Nom du produit" /><br />
+      <span id="nomErr"></span><br /><br />
+      <input id="quantite" type="number" placeholder="Quantité" /><br />
+      <span id="qteErr"></span><br /><br />
+      <input
+        id="prixUHT"
+        type="number"
+        placeholder="Prix unitaire hors taxe"
+      /><br />
+      <span id="prixUHTErr"></span><br /><br />
+      <input id="btn" type="submit" value="Envoyer" />
+    </div>
+  </body>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const btn = document.querySelector('#btn');
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const nom = document.querySelector('#nom').value;
+      const prixUHT = document.querySelector('#prixUHT').value;
+      const quantite = document.querySelector('#quantite').value;
+      const nomErr = document.querySelector('#nomErr');
+      const qteErr = document.querySelector('#qteErr');
+      const prixUHTErr = document.querySelector('#prixUHTErr');
+      const success = document.querySelector('#success');
+
+      nomErr.innerHTML = '';
+      qteErr.innerHTML = '';
+      prixUHTErr.innerHTML = '';
+      success.innerHTML = '';
+      axios
+        .post('http://localhost:5000/api/produits', {
+          nom,
+          prixUHT,
+          quantite,
+        })
+        .then((res) => {
+          console.log(res.data);
+          success.innerHTML = res.data.message;
+          success.style.color = 'white';
+          success.style.backgroundColor = 'green';
+          success.style.padding = '15px';
+        })
+        .catch((erreur) => {
+          const listErreurs = erreur.response.data.listErreur;
+          for (let erreur of listErreurs) {
+            if (erreur.param === 'nom') {
+              nomErr.innerHTML = erreur.msg;
+              nomErr.style.color = 'red';
+            }
+            if (erreur.param === 'quantite') {
+              qteErr.innerHTML = erreur.msg;
+              qteErr.style.color = 'red';
+            }
+
+            if (erreur.param === 'prixUHT') {
+              prixUHTErr.innerHTML = erreur.msg;
+              prixUHTErr.style.color = 'red';
+            }
+          }
+        });
+    });
+  </script>
+</html>
